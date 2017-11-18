@@ -18,10 +18,10 @@
   "extra": {
     "laravel": {
         "providers": [
-            "adman9000\\laravel-binance\\BinanceServiceProvider"
+            "adman9000\\binance\\BinanceServiceProvider"
         ],
         "aliases": {
-            "Binance": "adman9000\\laravel-binance\\BinanceAPIFacade"
+            "Binance": "adman9000\\binance\\BinanceAPIFacade"
         }
     }
 }
