@@ -15,6 +15,11 @@
     "ext-curl": "*",
     "laravel/framework": ">=5.3"
   },
+  "autoload": {
+    "psr-4": {
+      "adman9000\\binance\\": "src/"
+    }
+  },
   "extra": {
     "laravel": {
         "providers": [
