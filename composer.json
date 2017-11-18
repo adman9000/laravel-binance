@@ -14,5 +14,16 @@
     "php": ">=5.6.4",
     "ext-curl": "*",
     "laravel/framework": ">=5.3"
-  }
+  },
+  "extra": {
+    "laravel": {
+        "providers": [
+            "adman9000\\laravel-binance\\BinanceServiceProvider"
+        ],
+        "aliases": {
+            "Binance": "adman9000\\laravel-binance\\BinanceAPIFacade"
+        }
+    }
+}
+
 }
