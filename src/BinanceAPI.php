@@ -34,12 +34,10 @@ class BinanceAPI
         curl_close($this->curl);
     }
 	
-	function test() {
+	function setAPI($key, $secret) {
 
-       // dd($this->getTicker());
-
-        dd($this->getBalances());
-
+       $this->key = $key;
+       $this->secret = $secret;
     }
 
      /**
@@ -51,6 +49,20 @@ class BinanceAPI
     {
         return $this->request("v1/ticker/allPrices");
     }
+
+     public function getCurrencies()
+    {
+       //Seems to be no such functionality
+       return false;
+    }
+
+     public function getMarkets()
+    {
+        $return = $this->request("v1/exchangeInfo");
+        return $return["symbols"];
+    }
+
+
 
     public function getBalances() {
 
@@ -90,8 +102,9 @@ class BinanceAPI
 
          // decode results
         $result = json_decode($result, true);
+        
         if(!is_array($result))
-            throw new BinanceAPIException('JSON decode error');
+            throw new \Exception('JSON decode error');
 
         return $result;
 
@@ -142,7 +155,7 @@ class BinanceAPI
          // decode results
         $result = json_decode($result, true);
         if(!is_array($result))
-            throw new BinanceAPIException('JSON decode error');
+            throw new \Exception('JSON decode error');
 
         return $result;
 
