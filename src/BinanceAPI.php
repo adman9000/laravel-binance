@@ -33,12 +33,16 @@ class BinanceAPI
     {
         curl_close($this->curl);
     }
-	
-	function setAPI($key, $secret) {
+    
+    function setAPI($key, $secret) {
 
        $this->key = $key;
        $this->secret = $secret;
     }
+
+
+    //------ PUBLIC API CALLS --------
+
 
      /**
      * Get ticker
@@ -64,12 +68,81 @@ class BinanceAPI
 
 
 
+   //------ PRIVATE API CALLS ----------
+
     public function getBalances() {
 
         $b = $this->privateRequest("v3/account");
         return $b['balances'];
 
     }
+
+    /** trade()
+     * @param $symbol - asset pair to trade
+     * @param $quantity - amount of trade asset
+     * @param $side - BUY or SELL
+     * @param $type - MARKET, LIMIT, STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, TAKE_PROFIT_LIMIT, LIMIT_MAKER
+     * @param $price - limit price
+     * @return
+    **/
+    public function trade($symbol,  $quantity, $side, $type='MARKET', $price=false) {
+
+
+
+        $data = [
+            'symbol' => $symbol,
+            'side' => $side,
+            'type' => $type,
+            'quantity' => $quantity
+        ];
+        if($price) $data['price'] = $price;
+
+        $b = $this->privateRequest("v3/order", $data, "POST");
+    
+        return $b;
+
+    }
+
+    /** marketSell()
+     * @param $symbol - asset pair to trade
+     * @param $quantity - amount of trade asset
+    */
+    public function marketSell($symbol, $quantity) {
+
+        return $this->trade($symbol, $quantity, "SELL", "MARKET");
+
+    }
+    /** marketBuy()
+     * @param $symbol - asset pair to trade
+     * @param $quantity - amount of trade asset
+    */
+    public function marketBuy($symbol, $quantity) {
+
+        return $this->trade($symbol, $quantity, "BUY", "MARKET");
+        
+    }
+
+    /** limitSell()
+     * @param $symbol - asset pair to trade
+     * @param $quantity - amount of trade asset
+    */
+    public function limitSell($symbol, $quantity, $price) {
+
+        return $this->trade($symbol, $quantity, "SELL", "LIMIT", $price);
+
+    }
+
+    /** marketSell()
+     * @param $symbol - asset pair to trade
+     * @param $quantity - amount of trade asset
+    */
+    public function limitBuy($symbol, $quantity, $price) {
+
+        return $this->trade($symbol, $quantity, "BUY", "LIMIT", $price);
+        
+    }
+
+    //------ REQUESTS FUNCTIONS ------
 
     private function request($url, $params = [], $method = "GET") {
         $opt = [
@@ -118,6 +191,7 @@ class BinanceAPI
             ]
         ];
 
+
         // build the POST data string
         $params['timestamp'] = number_format(microtime(true)*1000,0,'.','');
         $query = http_build_query($params, '', '&');
@@ -141,10 +215,11 @@ class BinanceAPI
         // Set URL & Header
         curl_setopt($this->curl, CURLOPT_URL, $this->url . $url."?{$query}&signature={$sign}");
 
+
         //Add post vars
         if($method == "POST") {
-            curl_setopt($ch,CURLOPT_POST, count($params));
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postdata);
+            curl_setopt($this->curl,CURLOPT_POST, 1);
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, array());
         }
 
         //Get result
