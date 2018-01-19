@@ -102,6 +102,8 @@ class BinanceAPI
     }
 
     /**
+     * Get trades for a specific account and symbol
+     *
      * @param string $symbol Currency pair
      * @param int $limit     Limit of trades. Max. 500
      * @return mixed
