@@ -121,6 +121,26 @@ class BinanceAPI
 
     }
 
+    public function getOpenOrders()
+    {
+
+
+        $b = $this->privateRequest('v3/openOrders');
+        return $b;
+
+    }
+
+    public function getAllOrders($symbol)
+    {
+
+        $data = [
+            'symbol' => $symbol
+        ];
+        $b = $this->privateRequest('v3/allOrders', $data);
+        return $b;
+
+    }
+
     /**
      * Base trade function
      *
