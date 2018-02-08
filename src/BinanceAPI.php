@@ -72,10 +72,25 @@ class BinanceAPI
      * @return mixed
      * @throws \Exception
      */
-    public function getTicker()
+    public function getTickers()
     {
         return $this->request('v1/ticker/allPrices');
     }
+
+    /**
+     * Get ticker
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getTicker($symbol)
+    {
+         $data = [
+            'symbol' => $symbol
+        ];
+        return $this->request('v1/ticker/allPrices', $data);
+    }
+
 
     public function getCurrencies()
     {
