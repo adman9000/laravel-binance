@@ -55,7 +55,16 @@ class BinanceAPI
 
 
     //------ PUBLIC API CALLS --------
-
+    /*
+    * getTicker
+    * getCurrencies
+    * getMarkets
+    *
+    *
+    *
+    *
+    *
+    */
 
     /**
      * Get ticker
@@ -86,7 +95,20 @@ class BinanceAPI
         return $return['symbols'];
     }
 
+
+
     //------ PRIVATE API CALLS ----------
+    /*
+    * getBalances
+    * getRecentTrades
+    * getOpenOrders
+    * getAllOrders
+    * trade
+    * marketSell
+    * marketBuy
+    * limitSell
+    * limitBuy
+    */
 
     /**
      * Get current account information
@@ -223,6 +245,9 @@ class BinanceAPI
     {
         return $this->trade($symbol, $quantity, 'BUY', 'LIMIT', $price);
     }
+
+
+
 
     //------ REQUESTS FUNCTIONS ------
 
