@@ -18,6 +18,7 @@ class BinanceAPI
         $this->key        = config('binance.auth.key');
         $this->secret     = config('binance.auth.secret');
         $this->url        = config('binance.urls.api');
+        $this->wapi_url   = config('binance.urls.wapi');
         $this->recvWindow = config('binance.settings.timing');
         $this->curl       = curl_init();
 
@@ -125,6 +126,7 @@ class BinanceAPI
     * marketBuy
     * limitSell
     * limitBuy
+    * depositAddress
     */
 
     /**
@@ -265,6 +267,16 @@ class BinanceAPI
 
 
 
+    /**
+     * Deposit Address
+     * @param string $symbol   Asset symbol
+     * @return mixed
+     **/
+    public function depositAddress($symbol) {
+
+        return $this->wapiRequest("v3/depositAddress.html", ['asset' => $symbol]);
+        
+    }
 
     //------ REQUESTS FUNCTIONS ------
 
@@ -320,6 +332,58 @@ class BinanceAPI
         $params['timestamp']  = number_format((microtime(true) * 1000), 0, '.', '');
         $params['recvWindow'] = $this->recvWindow;
 
+        $query   = http_build_query($params, '', '&');
+
+        // set API key and sign the message
+        $sign    = hash_hmac('sha256', $query, $this->secret);
+
+        $headers = array(
+            'X-MBX-APIKEY: ' . $this->key
+        );
+
+        // make request
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
+   
+         // build the POST data string
+        $postdata = $params;
+
+        // Set URL & Header
+        curl_setopt($this->curl, CURLOPT_URL, $this->url . $url."?{$query}&signature={$sign}");
+
+        //Add post vars
+        if($method == "POST") {
+            curl_setopt($this->curl,CURLOPT_POST, 1);
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, array());
+        }
+
+        //Get result
+        $result = curl_exec($this->curl);
+        if($result === false)
+            throw new \Exception('CURL error: ' . curl_error($this->curl));
+
+         // decode results
+        $result = json_decode($result, true);
+        if(!is_array($result) || json_last_error())
+            throw new \Exception('JSON decode error');
+
+        return $result;
+
+    }
+
+    /**
+     * Make wapi requests
+     *
+     * @param string $url    URL Endpoint
+     * @param array $params  Required and optional parameters
+     * @param string $method GET, POST, PUT, DELETE
+     * @return mixed
+     * @throws \Exception
+     */
+    private function wapiRequest($url, $params = [], $method = 'GET')
+    {
+        // build the POST data string
+        $params['timestamp']  = number_format((microtime(true) * 1000), 0, '.', '');
+        $params['recvWindow'] = $this->recvWindow;
 
         $query   = http_build_query($params, '', '&');
 
@@ -333,13 +397,11 @@ class BinanceAPI
         // make request
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
    
-
          // build the POST data string
         $postdata = $params;
 
-
         // Set URL & Header
-        curl_setopt($this->curl, CURLOPT_URL, $this->url . $url."?{$query}&signature={$sign}");
+        curl_setopt($this->curl, CURLOPT_URL, $this->wapi_url . $url."?{$query}&signature={$sign}");
 
         //Add post vars
         if($method == "POST") {
