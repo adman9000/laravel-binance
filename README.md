@@ -1,5 +1,5 @@
 # laravel-binance
-Implementation of Binance trading API for Laravel
+Laravel implementation of the Binance crypto exchange trading API
 
 ## Install
 
