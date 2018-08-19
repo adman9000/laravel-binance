@@ -1,2 +1,30 @@
 # laravel-binance
 Implementation of Binance trading API for Laravel
+
+## Install
+
+#### Install via Composer
+
+```
+composer require adman9000/laravel-binance
+```
+
+Utilises autoloading in Laravel 5.5+. For older versions add the following lines to your `config/app.php`
+
+```php
+'providers' => [
+        ...
+        adman9000\binance\BinanceServiceProvider::class,
+        ...
+    ],
+
+
+ 'aliases' => [
+        ...
+        'Kraken' => adman9000\binance\BinanceAPIFacade::class,
+    ],
+```
+
+## Features
+
+Price tickers, balances, trades
