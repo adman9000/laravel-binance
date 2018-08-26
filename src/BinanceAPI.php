@@ -98,7 +98,18 @@ class BinanceAPI
     public function getCurrencies()
     {
        //Seems to be no such functionality
-       return false;
+        $return =array();
+        $assets = $this->getMarkets();
+        foreach($assets as $result) {
+            if($result['quoteAsset'] == "BTC") {
+                $row = array();
+                $row['code'] = $result['baseAsset'];
+                $row['name'] = $result['baseAsset'];
+                $return[] = $row;
+            }
+        }
+
+        return $return;
     }
 
     /**
