@@ -278,6 +278,39 @@ class BinanceAPI
         
     }
 
+    /**
+    * Deposit History
+    * @param string $symbol   Asset symbol optional
+    * @param string $status   Deposit status optional
+    * @return mixed
+    **/
+    public function depositHistory($symbol=false, $status=false) {
+        return $this->wapiRequest("v3/depositHistory.html", ['asset' => $symbol, 'status' => $status]);
+    }
+
+    /**
+    * Withdrawal History
+    * @param string $symbol   Asset symbol optional
+    * @param string $status   Deposit status optional
+    * @return mixed
+    **/
+    public function withdrawalHistory($symbol=false, $status=false) {
+        return $this->wapiRequest("v3/withdrawHistory.html", ['asset' => $symbol, 'status' => $status]);
+    }
+
+    /**
+    * Withdraw Funds
+    * @param string $symbol   Asset symbol
+    * @param string $address
+    * @param string $amount
+    * @param string $addresstag optional
+    * @param string $addressname optional
+    * @return mixed
+    **/
+    public function withdrawFunds($symbol, $address, $amount, $addresstag=false, $addressname=false) {
+        return $this->wapiRequest("v3/withdraw.html", ['asset' => $symbol, 'amount' => $amount, 'address' => $address, 'addresstag' => $addresstag, 'addressname' => $addressname]);
+    }
+
     //------ REQUESTS FUNCTIONS ------
 
     /**
