@@ -13,17 +13,23 @@ class BinanceAPI
     /**
      * Constructor for BinanceAPI
      */
-    function __construct()
+    function __construct(array $auth = null, array $urls = null, array $settings = null)
     {
-        $this->key        = config('binance.auth.key');
-        $this->secret     = config('binance.auth.secret');
-        $this->url        = config('binance.urls.api');
-        $this->wapi_url   = config('binance.urls.wapi');
-        $this->recvWindow = config('binance.settings.timing');
+        if(!$auth)      $auth       = config("binance.auth");
+        if(!$urls)      $urls       = config("binance.urls");
+        if(!$settings)  $settings   = config("binance.settings");
+
+        $this->key    = array_get($auth, 'key');
+        $this->secret = array_get($auth, 'secret');
+
+        $this->url        = array_get($urls, 'api');
+        $this->wapi_url   = array_get($urls, 'wapi');
+
+        $this->recvWindow = array_get($settings, 'timing');
         $this->curl       = curl_init();
 
         $curl_options     = [
-            CURLOPT_SSL_VERIFYPEER => config('binance.settings.ssl'),
+            CURLOPT_SSL_VERIFYPEER => array_get($settings, 'ssl'),
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT      => 'Binance PHP API Agent',
             CURLOPT_RETURNTRANSFER => true,
@@ -32,7 +38,7 @@ class BinanceAPI
         ];
 
         curl_setopt_array($this->curl, $curl_options);
-        
+
     }
 
     /**
