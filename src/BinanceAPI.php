@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace adman9000\binance;
 
 class BinanceAPI
@@ -68,8 +68,8 @@ class BinanceAPI
     * getServerTime
     * getExchangeInfo
     * getMarkets
-    * getTicker
-    * getCurrencies
+    * getTickers
+    * getOrderBook
     */
 
 
@@ -120,6 +120,25 @@ class BinanceAPI
     public function getTickers()
     {
         return $this->request('v1/ticker/allPrices');
+    }
+
+
+    /**
+     * Order book
+     *
+     * @param string $symbol
+     * @param int $limit default 100; max 1000; Valid limits:[5, 10, 20, 50, 100, 500, 1000]
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getOrderBook($symbol = 'BNBBTC', $limit = 100)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/depth', $data);
     }
 
 
@@ -215,7 +234,7 @@ class BinanceAPI
         }
 
         $b = $this->privateRequest('v3/order', $data, 'POST');
-    
+
         return $b;
     }
 
@@ -283,7 +302,7 @@ class BinanceAPI
     public function depositAddress($symbol) {
 
         return $this->wapiRequest("v3/depositAddress.html", ['asset' => $symbol]);
-        
+
     }
 
     //------ REQUESTS FUNCTIONS ------
@@ -299,8 +318,17 @@ class BinanceAPI
      */
     private function request($url, $params = [], $method = 'GET')
     {
-        // Set URL & Header
-        curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
+        if($params)
+        {
+            $query   = http_build_query($params, '', '&');
+            // Set URL & Header
+            curl_setopt($this->curl, CURLOPT_URL, $this->url . $url . "?{$query}");
+
+        } else {
+            // Set URL & Header
+            curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
+        }
+
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array());
 
         //Add post vars
@@ -351,7 +379,7 @@ class BinanceAPI
 
         // make request
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
-   
+
          // build the POST data string
         $postdata = $params;
 
@@ -404,7 +432,7 @@ class BinanceAPI
 
         // make request
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
-   
+
          // build the POST data string
         $postdata = $params;
 
