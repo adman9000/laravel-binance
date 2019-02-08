@@ -76,6 +76,7 @@ class BinanceAPI
      * getAvgPrice
      * getTickerChange
      * getTickerPrice
+     * getBookTicker
      */
 
 
@@ -297,6 +298,24 @@ class BinanceAPI
         ];
 
         return $this->request('v3/ticker/price', $data);
+    }
+
+
+    /**
+     * Symbol order book ticker
+     * Best price/qty on the order book for a symbol or symbols.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getBookTicker($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/ticker/bookTicker', $data);
     }
 
 
