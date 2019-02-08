@@ -71,6 +71,7 @@ class BinanceAPI
     * getTickers
     * getOrderBook
     * getPublicTrades
+    * getAggTrades
     */
 
 
@@ -160,6 +161,41 @@ class BinanceAPI
         ];
 
         return $this->request('v1/trades', $data);
+    }
+
+
+    /**
+     * Compressed/Aggregate trades list
+     * Get compressed, aggregate trades. Trades that fill at the time, from the same order, with the same price will have the quantity aggregated.
+     *
+     * "a": 26129,         // Aggregate tradeId
+     * "p": "0.01633102",  // Price
+     * "q": "4.70443515",  // Quantity
+     * "f": 27781,         // First tradeId
+     * "l": 27781,         // Last tradeId
+     * "T": 1498793709153, // Timestamp
+     * "m": true,          // Was the buyer the maker?
+     * "M": true           // Was the trade the best price match?
+     *
+     * @param string $symbol
+     * @param int $fromId
+     * @param timestamp $startTime
+     * @param timestamp $endTime
+     * @param int $limit Default 500; max 1000.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getAggTrades($symbol = 'BNBBTC', $fromId = null, $startTime = null, $endTime = null, $limit = 500)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'fromId' => $fromId,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/aggTrades', $data);
     }
 
 
