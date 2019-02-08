@@ -74,6 +74,7 @@ class BinanceAPI
      * getAggTrades
      * getCandlesticks
      * getAvgPrice
+     * getTickerChange
      */
 
 
@@ -258,6 +259,25 @@ class BinanceAPI
         ];
 
         return $this->request('v3/avgPrice', $data);
+    }
+
+
+    /**
+     * 24hr ticker price change statistics
+     * 24 hour rolling window price change statistics. Careful when accessing this with no symbol.
+     * Weight: 1 for a single symbol; 40 when the symbol parameter is omitted
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getTickerChange($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v1/ticker/24hr', $data);
     }
 
 
