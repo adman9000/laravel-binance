@@ -72,6 +72,7 @@ class BinanceAPI
     * getOrderBook
     * getPublicTrades
     * getAggTrades
+    * getCandlesticks
     */
 
 
@@ -196,6 +197,48 @@ class BinanceAPI
         ];
 
         return $this->request('v1/aggTrades', $data);
+    }
+
+
+    /**
+     * Kline/Candlestick data
+     * Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
+     *
+     * candlesticks get the candles for the given intervals
+     * 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
+     *
+     * 1499040000000,      // Open time
+     * "0.01634790",       // Open
+     * "0.80000000",       // High
+     * "0.01575800",       // Low
+     * "0.01577100",       // Close
+     * "148976.11427815",  // Volume
+     * 1499644799999,      // Close time
+     * "2434.19055334",    // Quote asset volume
+     * 308,                // Number of trades
+     * "1756.87402397",    // Taker buy base asset volume
+     * "28.46694368",      // Taker buy quote asset volume
+     * "17928899.62484339" // Ignore.
+     *
+     * @param string $symbol
+     * @param string $interval
+     * @param timestamp $startTime
+     * @param timestamp $endTime
+     * @param int $limit Default 500; max 1000.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getCandlesticks($symbol = 'BNBBTC', $interval = '1h', $startTime = null, $endTime = null, $limit = 500)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'interval' => $interval,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/klines', $data);
     }
 
 
