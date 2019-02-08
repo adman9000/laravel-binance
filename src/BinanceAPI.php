@@ -123,13 +123,6 @@ class BinanceAPI
     }
 
 
-    public function getCurrencies()
-    {
-       //Seems to be no such functionality
-       return false;
-    }
-
-
     //------ PRIVATE API CALLS ----------
     /*
     * getBalances
