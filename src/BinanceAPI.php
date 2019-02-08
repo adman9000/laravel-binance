@@ -70,6 +70,7 @@ class BinanceAPI
     * getMarkets
     * getTickers
     * getOrderBook
+    * getPublicTrades
     */
 
 
@@ -139,6 +140,26 @@ class BinanceAPI
         ];
 
         return $this->request('v1/depth', $data);
+    }
+
+
+    /**
+     * Recent trades
+     * Get recent trades (up to last 500).
+     *
+     * @param string $symbol
+     * @param int $limit Default 500; max 1000.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getPublicTrades($symbol = 'BNBBTC', $limit = 500)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/trades', $data);
     }
 
 
