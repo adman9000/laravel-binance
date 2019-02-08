@@ -65,15 +65,16 @@ class BinanceAPI
 
     //------ PUBLIC API CALLS --------
     /*
-    * getServerTime
-    * getExchangeInfo
-    * getMarkets
-    * getTickers
-    * getOrderBook
-    * getPublicTrades
-    * getAggTrades
-    * getCandlesticks
-    */
+     * getServerTime
+     * getExchangeInfo
+     * getMarkets
+     * getTickers
+     * getOrderBook
+     * getPublicTrades
+     * getAggTrades
+     * getCandlesticks
+     * getAvgPrice
+     */
 
 
     /**
@@ -239,6 +240,24 @@ class BinanceAPI
         ];
 
         return $this->request('v1/klines', $data);
+    }
+
+
+    /**
+     * Current average price
+     * Current average price for a symbol.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getAvgPrice($symbol = 'BNBBTC')
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/avgPrice', $data);
     }
 
 
