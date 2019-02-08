@@ -75,6 +75,7 @@ class BinanceAPI
      * getCandlesticks
      * getAvgPrice
      * getTickerChange
+     * getTickerPrice
      */
 
 
@@ -278,6 +279,24 @@ class BinanceAPI
         ];
 
         return $this->request('v1/ticker/24hr', $data);
+    }
+
+
+    /**
+     * Symbol price ticker
+     * Latest price for a symbol or symbols.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getTickerPrice($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/ticker/price', $data);
     }
 
 
