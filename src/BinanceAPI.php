@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace adman9000\binance;
 
 class BinanceAPI
@@ -13,17 +13,23 @@ class BinanceAPI
     /**
      * Constructor for BinanceAPI
      */
-    function __construct()
+    function __construct(array $auth = null, array $urls = null, array $settings = null)
     {
-        $this->key        = config('binance.auth.key');
-        $this->secret     = config('binance.auth.secret');
-        $this->url        = config('binance.urls.api');
-        $this->wapi_url   = config('binance.urls.wapi');
-        $this->recvWindow = config('binance.settings.timing');
+        if(!$auth)      $auth       = config("binance.auth");
+        if(!$urls)      $urls       = config("binance.urls");
+        if(!$settings)  $settings   = config("binance.settings");
+
+        $this->key    = array_get($auth, 'key');
+        $this->secret = array_get($auth, 'secret');
+
+        $this->url        = array_get($urls, 'api');
+        $this->wapi_url   = array_get($urls, 'wapi');
+
+        $this->recvWindow = array_get($settings, 'timing');
         $this->curl       = curl_init();
 
         $curl_options     = [
-            CURLOPT_SSL_VERIFYPEER => config('binance.settings.ssl'),
+            CURLOPT_SSL_VERIFYPEER => array_get($settings, 'ssl'),
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT      => 'Binance PHP API Agent',
             CURLOPT_RETURNTRANSFER => true,
@@ -32,7 +38,7 @@ class BinanceAPI
         ];
 
         curl_setopt_array($this->curl, $curl_options);
-        
+
     }
 
     /**
@@ -59,15 +65,58 @@ class BinanceAPI
 
     //------ PUBLIC API CALLS --------
     /*
-    * getTicker
-    * getCurrencies
-    * getMarkets
-    *
-    *
-    *
-    *
-    *
-    */
+     * getServerTime
+     * getExchangeInfo
+     * getMarkets
+     * getTickers
+     * getOrderBook
+     * getPublicTrades
+     * getAggTrades
+     * getCandlesticks
+     * getAvgPrice
+     * getTickerChange
+     * getTickerPrice
+     * getBookTicker
+     */
+
+
+    /**
+     * Test connectivity to the Rest API and get the current server time.
+     *
+     * @return timestamp
+     * @throws \Exception
+     */
+    public function getServerTime()
+    {
+        $return = $this->request('v1/time');
+        return $return['serverTime'];
+    }
+
+
+    /**
+     * Current exchange trading rules and symbol information
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getExchangeInfo()
+    {
+        return $this->request('v1/exchangeInfo');
+    }
+
+
+    /**
+     * Symbol information via exchangeInfo
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getMarkets()
+    {
+        $return = $this->request('v1/exchangeInfo');
+        return $return['symbols'];
+    }
+
 
     /**
      * Get ticker
@@ -80,39 +129,194 @@ class BinanceAPI
         return $this->request('v1/ticker/allPrices');
     }
 
+
     /**
-     * Get ticker
+     * Order book
      *
+     * @param string $symbol
+     * @param int $limit default 100; max 1000; Valid limits:[5, 10, 20, 50, 100, 500, 1000]
      * @return mixed
      * @throws \Exception
      */
-    public function getTicker($symbol)
+    public function getOrderBook($symbol = 'BNBBTC', $limit = 100)
     {
-         $data = [
-            'symbol' => $symbol
+        $data = [
+            'symbol' => $symbol,
+            'limit'  => $limit,
         ];
-        return $this->request('v1/ticker/allPrices', $data);
+
+        return $this->request('v1/depth', $data);
     }
 
-
-    public function getCurrencies()
-    {
-       //Seems to be no such functionality
-       return false;
-    }
 
     /**
-     * Current exchange trading rules and symbol information
+     * Recent trades
+     * Get recent trades (up to last 500).
      *
+     * @param string $symbol
+     * @param int $limit Default 500; max 1000.
      * @return mixed
      * @throws \Exception
      */
-    public function getMarkets()
+    public function getPublicTrades($symbol = 'BNBBTC', $limit = 500)
     {
-        $return = $this->request('v1/exchangeInfo');
-        return $return['symbols'];
+        $data = [
+            'symbol' => $symbol,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/trades', $data);
     }
 
+
+    /**
+     * Compressed/Aggregate trades list
+     * Get compressed, aggregate trades. Trades that fill at the time, from the same order, with the same price will have the quantity aggregated.
+     *
+     * "a": 26129,         // Aggregate tradeId
+     * "p": "0.01633102",  // Price
+     * "q": "4.70443515",  // Quantity
+     * "f": 27781,         // First tradeId
+     * "l": 27781,         // Last tradeId
+     * "T": 1498793709153, // Timestamp
+     * "m": true,          // Was the buyer the maker?
+     * "M": true           // Was the trade the best price match?
+     *
+     * @param string $symbol
+     * @param int $fromId
+     * @param timestamp $startTime
+     * @param timestamp $endTime
+     * @param int $limit Default 500; max 1000.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getAggTrades($symbol = 'BNBBTC', $fromId = null, $startTime = null, $endTime = null, $limit = 500)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'fromId' => $fromId,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/aggTrades', $data);
+    }
+
+
+    /**
+     * Kline/Candlestick data
+     * Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
+     *
+     * candlesticks get the candles for the given intervals
+     * 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
+     *
+     * 1499040000000,      // Open time
+     * "0.01634790",       // Open
+     * "0.80000000",       // High
+     * "0.01575800",       // Low
+     * "0.01577100",       // Close
+     * "148976.11427815",  // Volume
+     * 1499644799999,      // Close time
+     * "2434.19055334",    // Quote asset volume
+     * 308,                // Number of trades
+     * "1756.87402397",    // Taker buy base asset volume
+     * "28.46694368",      // Taker buy quote asset volume
+     * "17928899.62484339" // Ignore.
+     *
+     * @param string $symbol
+     * @param string $interval
+     * @param timestamp $startTime
+     * @param timestamp $endTime
+     * @param int $limit Default 500; max 1000.
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getCandlesticks($symbol = 'BNBBTC', $interval = '1h', $startTime = null, $endTime = null, $limit = 500)
+    {
+        $data = [
+            'symbol' => $symbol,
+            'interval' => $interval,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'limit'  => $limit,
+        ];
+
+        return $this->request('v1/klines', $data);
+    }
+
+
+    /**
+     * Current average price
+     * Current average price for a symbol.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getAvgPrice($symbol = 'BNBBTC')
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/avgPrice', $data);
+    }
+
+
+    /**
+     * 24hr ticker price change statistics
+     * 24 hour rolling window price change statistics. Careful when accessing this with no symbol.
+     * Weight: 1 for a single symbol; 40 when the symbol parameter is omitted
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getTickerChange($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v1/ticker/24hr', $data);
+    }
+
+
+    /**
+     * Symbol price ticker
+     * Latest price for a symbol or symbols.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getTickerPrice($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/ticker/price', $data);
+    }
+
+
+    /**
+     * Symbol order book ticker
+     * Best price/qty on the order book for a symbol or symbols.
+     *
+     * @param string $symbol
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getBookTicker($symbol = null)
+    {
+        $data = [
+            'symbol' => $symbol,
+        ];
+
+        return $this->request('v3/ticker/bookTicker', $data);
+    }
 
 
     //------ PRIVATE API CALLS ----------
@@ -207,7 +411,7 @@ class BinanceAPI
         }
 
         $b = $this->privateRequest('v3/order', $data, 'POST');
-    
+
         return $b;
     }
 
@@ -275,7 +479,7 @@ class BinanceAPI
     public function depositAddress($symbol) {
 
         return $this->wapiRequest("v3/depositAddress.html", ['asset' => $symbol]);
-        
+
     }
 
     //------ REQUESTS FUNCTIONS ------
@@ -291,8 +495,17 @@ class BinanceAPI
      */
     private function request($url, $params = [], $method = 'GET')
     {
-        // Set URL & Header
-        curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
+        if($params)
+        {
+            $query   = http_build_query($params, '', '&');
+            // Set URL & Header
+            curl_setopt($this->curl, CURLOPT_URL, $this->url . $url . "?{$query}");
+
+        } else {
+            // Set URL & Header
+            curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
+        }
+
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array());
 
         //Add post vars
@@ -343,7 +556,7 @@ class BinanceAPI
 
         // make request
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
-   
+
          // build the POST data string
         $postdata = $params;
 
@@ -396,7 +609,7 @@ class BinanceAPI
 
         // make request
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
-   
+
          // build the POST data string
         $postdata = $params;
 
