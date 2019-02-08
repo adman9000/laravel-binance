@@ -65,6 +65,7 @@ class BinanceAPI
 
     //------ PUBLIC API CALLS --------
     /*
+    * getServerTime
     * getTicker
     * getCurrencies
     * getMarkets
@@ -74,6 +75,20 @@ class BinanceAPI
     *
     *
     */
+
+
+    /**
+     * Test connectivity to the Rest API and get the current server time.
+     *
+     * @return timestamp
+     * @throws \Exception
+     */
+    public function getServerTime()
+    {
+        $return = $this->request('v1/time');
+        return $return['serverTime'];
+    }
+    
 
     /**
      * Get ticker
