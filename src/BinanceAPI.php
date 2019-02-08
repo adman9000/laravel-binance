@@ -66,14 +66,11 @@ class BinanceAPI
     //------ PUBLIC API CALLS --------
     /*
     * getServerTime
+    * getExchangeInfo
+    * getMarkets
     * getTicker
     * getCurrencies
     * getMarkets
-    *
-    *
-    *
-    *
-    *
     */
 
 
@@ -88,7 +85,32 @@ class BinanceAPI
         $return = $this->request('v1/time');
         return $return['serverTime'];
     }
-    
+
+
+    /**
+     * Current exchange trading rules and symbol information
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getExchangeInfo()
+    {
+        return $this->request('v1/exchangeInfo');
+    }
+
+
+    /**
+     * Symbol information via exchangeInfo
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getMarkets()
+    {
+        $return = $this->request('v1/exchangeInfo');
+        return $return['symbols'];
+    }
+
 
     /**
      * Get ticker
@@ -100,6 +122,7 @@ class BinanceAPI
     {
         return $this->request('v1/ticker/allPrices');
     }
+    
 
     /**
      * Get ticker
@@ -121,19 +144,6 @@ class BinanceAPI
        //Seems to be no such functionality
        return false;
     }
-
-    /**
-     * Current exchange trading rules and symbol information
-     *
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getMarkets()
-    {
-        $return = $this->request('v1/exchangeInfo');
-        return $return['symbols'];
-    }
-
 
 
     //------ PRIVATE API CALLS ----------
