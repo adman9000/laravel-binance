@@ -29,8 +29,8 @@ class BinanceAPI
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT      => 'Binance PHP API Agent',
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 20,
-            CURLOPT_TIMEOUT => 300
+            CURLOPT_CONNECTTIMEOUT => config('binance.settings.connectiontimeout'),
+            CURLOPT_TIMEOUT => config('binance.settings.timeout')
         ];
 
         curl_setopt_array($this->curl, $curl_options);
