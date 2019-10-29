@@ -40,7 +40,9 @@ return [
 
     'settings' => [
         'timing' => env('BINANCE_TIMING', 5000),
-        'ssl'    => env('BINANCE_SSL_VERIFYPEER', true)
+        'ssl'    => env('BINANCE_SSL_VERIFYPEER', true),
+        'connectiontimeout' => env('BINANCE_SETTINGS_CONNECTIONTIMEOUT', 20),
+        'timeout' => env('BINANCE_SETTINGS_TIMEOUT', 300)
     ],
 
 ];

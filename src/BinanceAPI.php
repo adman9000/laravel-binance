@@ -27,8 +27,8 @@ class BinanceAPI
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT      => 'Binance PHP API Agent',
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 20,
-            CURLOPT_TIMEOUT => 300
+            CURLOPT_CONNECTTIMEOUT => config('binance.settings.connectiontimeout'),
+            CURLOPT_TIMEOUT => config('binance.settings.timeout')
         ];
 
         curl_setopt_array($this->curl, $curl_options);
@@ -305,13 +305,12 @@ class BinanceAPI
         //Get result
         $result = curl_exec($this->curl);
         if($result === false)
-            throw new \Exception('CURL error: ' . curl_error($this->curl));
+            return null;
 
         // decode results
         $result = json_decode($result, true);
-
         if(!is_array($result) || json_last_error())
-            throw new \Exception('JSON decode error');
+            return null;
 
         return $result;
 
@@ -359,12 +358,12 @@ class BinanceAPI
         //Get result
         $result = curl_exec($this->curl);
         if($result === false)
-            throw new \Exception('CURL error: ' . curl_error($this->curl));
+            return null;
 
-         // decode results
+        // decode results
         $result = json_decode($result, true);
         if(!is_array($result) || json_last_error())
-            throw new \Exception('JSON decode error');
+            return null;
 
         return $result;
 
@@ -412,12 +411,12 @@ class BinanceAPI
         //Get result
         $result = curl_exec($this->curl);
         if($result === false)
-            throw new \Exception('CURL error: ' . curl_error($this->curl));
+            return null;
 
-         // decode results
+        // decode results
         $result = json_decode($result, true);
         if(!is_array($result) || json_last_error())
-            throw new \Exception('JSON decode error');
+            return null;
 
         return $result;
 

@@ -25,6 +25,14 @@ Utilises autoloading in Laravel 5.5+. For older versions add the following lines
     ],
 ```
 
+#### Publish config
+
+Create a configurable config file:
+
+```
+php artisan vendor:publish --provider="adman9000\binance\BinanceServiceProvider"
+```
+
 ## Features
 
 Price tickers, balances, trades
