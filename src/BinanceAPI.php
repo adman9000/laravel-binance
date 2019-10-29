@@ -1,8 +1,6 @@
 <?php 
 namespace adman9000\binance;
 
-use Log;
-
 class BinanceAPI
 {
     protected $key;         // API key
@@ -306,14 +304,13 @@ class BinanceAPI
 
         //Get result
         $result = curl_exec($this->curl);
-        if($result === false) {
-            Log::Error('BinanceAPI: CURL not completed. No network? Error: '.curl_error($this->curl));
-        } else {
-            // decode results
-            $result = json_decode($result, true);
-            if(!is_array($result) || json_last_error())
-                Log::Error('BinanceAPI: JSON decode error in Binance API');
-        }
+        if($result === false)
+            return null;
+
+        // decode results
+        $result = json_decode($result, true);
+        if(!is_array($result) || json_last_error())
+            return null;
 
         return $result;
 
@@ -360,14 +357,13 @@ class BinanceAPI
 
         //Get result
         $result = curl_exec($this->curl);
-        if($result === false) {
-            Log::Error('BinanceAPI: CURL not completed. No network? Error: '.curl_error($this->curl));
-        } else {
-            // decode results
-            $result = json_decode($result, true);
-            if(!is_array($result) || json_last_error())
-                Log::Error('BinanceAPI: JSON decode error in Binance API');
-        }
+        if($result === false)
+            return null;
+
+        // decode results
+        $result = json_decode($result, true);
+        if(!is_array($result) || json_last_error())
+            return null;
 
         return $result;
 
@@ -414,14 +410,13 @@ class BinanceAPI
 
         //Get result
         $result = curl_exec($this->curl);
-        if($result === false) {
-            Log::Error('BinanceAPI: CURL not completed. No network? Error: '.curl_error($this->curl));
-        } else {
-            // decode results
-            $result = json_decode($result, true);
-            if(!is_array($result) || json_last_error())
-                Log::Error('BinanceAPI: JSON decode error in Binance API');
-        }
+        if($result === false)
+            return null;
+
+        // decode results
+        $result = json_decode($result, true);
+        if(!is_array($result) || json_last_error())
+            return null;
 
         return $result;
 
