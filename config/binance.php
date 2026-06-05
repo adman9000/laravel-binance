@@ -1,46 +1,39 @@
 <?php
+
 return [
+
     /*
     |--------------------------------------------------------------------------
-    | Binance authentication
+    | Binance API Authentication
     |--------------------------------------------------------------------------
-    |
-    | Authentication key and secret for Binance API.
-    |
-     */
+    */
 
     'auth' => [
-        'key'        => env('BINANCE_KEY', ''),
-        'secret'     => env('BINANCE_SECRET', '')
+        'key'    => env('BINANCE_KEY', ''),
+        'secret' => env('BINANCE_SECRET', ''),
     ],
 
     /*
     |--------------------------------------------------------------------------
     | API URLs
     |--------------------------------------------------------------------------
-    |
-    | Binance API endpoints
-    |
-     */
+    */
 
     'urls' => [
         'api'  => 'https://api.binance.com/api/',
-        'wapi'  => 'https://api.binance.com/wapi/'
+        'sapi' => 'https://api.binance.com/sapi/',
     ],
-
 
     /*
     |--------------------------------------------------------------------------
     | API Settings
     |--------------------------------------------------------------------------
-    |
-    | Binance API settings
-    |
-     */
+    */
 
     'settings' => [
-        'timing' => env('BINANCE_TIMING', 5000),
-        'ssl'    => env('BINANCE_SSL_VERIFYPEER', true)
+        'timing'          => env('BINANCE_TIMING', 5000),
+        'timeout'         => env('BINANCE_TIMEOUT', 30),
+        'connect_timeout' => env('BINANCE_CONNECT_TIMEOUT', 10),
     ],
 
 ];

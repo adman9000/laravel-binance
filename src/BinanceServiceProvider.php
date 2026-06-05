@@ -1,27 +1,24 @@
-<?php namespace adman9000\binance;
+<?php
 
-/**
- * @author  adman9000
- */
+namespace adman9000\binance;
+
 use Illuminate\Support\ServiceProvider;
 
-class BinanceServiceProvider extends ServiceProvider {
+class BinanceServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        $this->publishes([
+            __DIR__ . '/../config/binance.php' => config_path('binance.php'),
+        ]);
+    }
 
-	public function boot() 
-	{
-		$this->publishes([
-			__DIR__.'/../config/binance.php' => config_path('binance.php')
-		]);
-	} // boot
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__ . '/../config/binance.php', 'binance');
 
-	public function register() 
-	{
-		$this->mergeConfigFrom(__DIR__.'/../config/binance.php', 'binance');
-		$this->app->bind('binance', function() {
-			return new BinanceAPI(config('binance'));
-		});
-
-		
-
-	} // register
+        $this->app->singleton('binance', function () {
+            return new BinanceAPI(config('binance'));
+        });
+    }
 }
