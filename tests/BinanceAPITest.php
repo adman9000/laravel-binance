@@ -225,6 +225,49 @@ class BinanceAPITest extends TestCase
         $this->assertEquals('BTC', $result[0]['asset']);
     }
 
+    public function test_get_balance_returns_matching_asset(): void
+    {
+        Http::fake([
+            'https://api.binance.com/api/v3/account*' => Http::response([
+                'balances' => [
+                    ['asset' => 'BTC', 'free' => '0.5', 'locked' => '0.0'],
+                    ['asset' => 'USDT', 'free' => '1000.0', 'locked' => '0.0'],
+                ],
+            ]),
+        ]);
+
+        $result = $this->binance()->getBalance('BTC');
+
+        $this->assertEquals('BTC', $result['asset']);
+        $this->assertEquals('0.5', $result['free']);
+    }
+
+    public function test_get_balance_is_case_insensitive(): void
+    {
+        Http::fake([
+            'https://api.binance.com/api/v3/account*' => Http::response([
+                'balances' => [
+                    ['asset' => 'BTC', 'free' => '0.5', 'locked' => '0.0'],
+                ],
+            ]),
+        ]);
+
+        $this->assertEquals('BTC', $this->binance()->getBalance('btc')['asset']);
+    }
+
+    public function test_get_balance_returns_null_for_unknown_asset(): void
+    {
+        Http::fake([
+            'https://api.binance.com/api/v3/account*' => Http::response([
+                'balances' => [
+                    ['asset' => 'BTC', 'free' => '0.5', 'locked' => '0.0'],
+                ],
+            ]),
+        ]);
+
+        $this->assertNull($this->binance()->getBalance('ETH'));
+    }
+
     public function test_get_recent_trades(): void
     {
         Http::fake([

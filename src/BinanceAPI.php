@@ -117,6 +117,17 @@ class BinanceAPI
         return $this->privateRequest('v3/account')['balances'];
     }
 
+    public function getBalance(string $asset): ?array
+    {
+        $asset = strtoupper($asset);
+        foreach ($this->getBalances() as $balance) {
+            if ($balance['asset'] === $asset) {
+                return $balance;
+            }
+        }
+        return null;
+    }
+
     public function getRecentTrades(string $symbol = 'BNBBTC', int $limit = 500): array
     {
         return $this->privateRequest('v3/myTrades', ['symbol' => $symbol, 'limit' => $limit]);
