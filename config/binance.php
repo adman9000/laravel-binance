@@ -20,8 +20,8 @@ return [
     */
 
     'urls' => [
-        'api'  => 'https://api.binance.com/api/',
-        'sapi' => 'https://api.binance.com/sapi/',
+        'api'  => env('BINANCE_API_URL', 'https://api.binance.com/api/'),
+        'sapi' => env('BINANCE_SAPI_URL', 'https://api.binance.com/sapi/'),
     ],
 
     /*
