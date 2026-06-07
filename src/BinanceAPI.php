@@ -15,7 +15,7 @@ class BinanceAPI
     protected int $recvWindow;
     protected int $timeout;
     protected int $connectTimeout;
-    protected int $timeOffset = 0;
+    private int $timeOffset = 0;
 
     public function __construct(array $config = [])
     {
@@ -43,11 +43,6 @@ class BinanceAPI
     public function getServerTime(): int
     {
         return $this->request('v3/time')['serverTime'];
-    }
-
-    public function syncTime(): void
-    {
-        $this->timeOffset = $this->getServerTime() - (int) (microtime(true) * 1000);
     }
 
     /** Returns all symbol prices, or a single price when $symbol is given. */
@@ -228,9 +223,8 @@ class BinanceAPI
 
             $data = $response->json();
 
-            // Auto-correct clock drift and retry once
             if (isset($data['code']) && $data['code'] === -1021 && $attempt === 0) {
-                $this->syncTime();
+                $this->timeOffset = $this->getServerTime() - (int) (microtime(true) * 1000);
                 $attempt++;
                 continue;
             }

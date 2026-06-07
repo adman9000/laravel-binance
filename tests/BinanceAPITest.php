@@ -355,34 +355,11 @@ class BinanceAPITest extends TestCase
         $this->assertArrayHasKey('address', $result);
     }
 
-    // -------- SYNC TIME --------
+    // -------- CLOCK DRIFT --------
 
-    public function test_sync_time_applies_offset_to_timestamp(): void
+    public function test_timestamp_drift_auto_retries_and_succeeds(): void
     {
-        $localNow   = (int) (microtime(true) * 1000);
-        $serverTime = $localNow - 2000; // server is 2 seconds behind local
-
-        Http::fake([
-            'https://api.binance.com/api/v3/time'     => Http::response(['serverTime' => $serverTime]),
-            'https://api.binance.com/api/v3/account*' => Http::response(['balances' => []]),
-        ]);
-
-        $binance = $this->binance();
-        $binance->syncTime();
-        $binance->getBalances();
-
-        Http::assertSent(function ($request) use ($serverTime) {
-            parse_str(parse_url($request->url(), PHP_URL_QUERY), $query);
-            // timestamp should be close to server time, not local time
-            return isset($query['timestamp'])
-                && abs((int) $query['timestamp'] - $serverTime) < 1000;
-        });
-    }
-
-    public function test_timestamp_ahead_error_auto_retries_and_succeeds(): void
-    {
-        $localNow   = (int) (microtime(true) * 1000);
-        $serverTime = $localNow - 2000;
+        $serverTime = (int) (microtime(true) * 1000) - 2000;
 
         Http::fake([
             'https://api.binance.com/api/v3/time'     => Http::response(['serverTime' => $serverTime]),
@@ -391,7 +368,6 @@ class BinanceAPITest extends TestCase
                 ->push(['balances' => [['asset' => 'BTC', 'free' => '1.0', 'locked' => '0.0']]]),
         ]);
 
-        // No manual syncTime() call — it should recover automatically
         $result = $this->binance()->getBalances();
 
         $this->assertEquals('BTC', $result[0]['asset']);
