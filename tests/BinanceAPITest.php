@@ -379,7 +379,7 @@ class BinanceAPITest extends TestCase
         });
     }
 
-    public function test_timestamp_ahead_error_resolved_by_sync_time(): void
+    public function test_timestamp_ahead_error_auto_retries_and_succeeds(): void
     {
         $localNow   = (int) (microtime(true) * 1000);
         $serverTime = $localNow - 2000;
@@ -391,19 +391,9 @@ class BinanceAPITest extends TestCase
                 ->push(['balances' => [['asset' => 'BTC', 'free' => '1.0', 'locked' => '0.0']]]),
         ]);
 
-        $binance = $this->binance();
+        // No manual syncTime() call — it should recover automatically
+        $result = $this->binance()->getBalances();
 
-        // First call throws the timestamp error
-        try {
-            $binance->getBalances();
-            $this->fail('Expected BinanceApiException for timestamp drift');
-        } catch (BinanceApiException $e) {
-            $this->assertStringContainsString('ahead of the server', $e->getMessage());
-        }
-
-        // After syncing, the call succeeds
-        $binance->syncTime();
-        $result = $binance->getBalances();
         $this->assertEquals('BTC', $result[0]['asset']);
     }
 

@@ -205,24 +205,38 @@ class BinanceAPI
 
     private function privateRequest(string $endpoint, array $params = [], string $method = 'GET', bool $sapi = false): array
     {
-        $params['timestamp']  = (int) (microtime(true) * 1000) + $this->timeOffset;
-        $params['recvWindow'] = $this->recvWindow;
+        $attempt = 0;
 
-        $query               = http_build_query($params, '', '&');
-        $params['signature'] = hash_hmac('sha256', $query, $this->secret);
+        do {
+            $requestParams = $params;
+            $requestParams['timestamp']  = (int) (microtime(true) * 1000) + $this->timeOffset;
+            $requestParams['recvWindow'] = $this->recvWindow;
 
-        $url  = ($sapi ? $this->sapiUrl : $this->apiUrl) . $endpoint;
-        $http = Http::timeout($this->timeout)
-            ->connectTimeout($this->connectTimeout)
-            ->withHeaders(['X-MBX-APIKEY' => $this->key]);
+            $query                       = http_build_query($requestParams, '', '&');
+            $requestParams['signature']  = hash_hmac('sha256', $query, $this->secret);
 
-        $response = match ($method) {
-            'POST'   => $http->post($url, $params),
-            'DELETE' => $http->delete($url, $params),
-            default  => $http->get($url, $params),
-        };
+            $url  = ($sapi ? $this->sapiUrl : $this->apiUrl) . $endpoint;
+            $http = Http::timeout($this->timeout)
+                ->connectTimeout($this->connectTimeout)
+                ->withHeaders(['X-MBX-APIKEY' => $this->key]);
 
-        return $this->parseResponse($response);
+            $response = match ($method) {
+                'POST'   => $http->post($url, $requestParams),
+                'DELETE' => $http->delete($url, $requestParams),
+                default  => $http->get($url, $requestParams),
+            };
+
+            $data = $response->json();
+
+            // Auto-correct clock drift and retry once
+            if (isset($data['code']) && $data['code'] === -1021 && $attempt === 0) {
+                $this->syncTime();
+                $attempt++;
+                continue;
+            }
+
+            return $this->parseResponse($response);
+        } while (true);
     }
 
     private function parseResponse(Response $response): array
