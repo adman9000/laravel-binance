@@ -216,7 +216,7 @@ class BinanceAPI
                 ->withHeaders(['X-MBX-APIKEY' => $this->key]);
 
             $response = match ($method) {
-                'POST'   => $http->post($url, $requestParams),
+                'POST'   => $http->asForm()->post($url, $requestParams),
                 'DELETE' => $http->delete($url, $requestParams),
                 default  => $http->get($url, $requestParams),
             };
