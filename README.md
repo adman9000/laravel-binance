@@ -83,7 +83,8 @@ Valid `$interval` values: `1s`, `1m`, `3m`, `5m`, `15m`, `30m`, `1h`, `2h`, `4h`
 
 | Method | Description |
 |---|---|
-| `getBalances()` | Account balances |
+| `getBalances()` | All account balances |
+| `getBalance(string $asset)` | Balance for a single asset (e.g. `'BTC'`), or `null` if not found |
 | `getRecentTrades(string $symbol, int $limit = 500)` | Your trade history for a symbol |
 | `getOpenOrders(string $symbol = '')` | Current open orders |
 | `getAllOrders(string $symbol)` | All orders for a symbol |
@@ -104,8 +105,8 @@ return [
         'secret' => env('BINANCE_SECRET', ''),
     ],
     'urls' => [
-        'api'  => 'https://api.binance.com/api/',
-        'sapi' => 'https://api.binance.com/sapi/',
+        'api'  => env('BINANCE_API_URL', 'https://api.binance.com/api/'),
+        'sapi' => env('BINANCE_SAPI_URL', 'https://api.binance.com/sapi/'),
     ],
     'settings' => [
         'timing'          => env('BINANCE_TIMING', 5000),         // recvWindow in ms
@@ -115,7 +116,21 @@ return [
 ];
 ```
 
-To use Binance US, set `BINANCE_API_URL=https://api.binance.us/api/` in your `.env` (or override `urls.api` in the published config).
+### Testnet
+
+To use the Binance testnet, add to your `.env`:
+
+```
+BINANCE_API_URL=https://testnet.binance.vision/api/
+BINANCE_SAPI_URL=https://testnet.binance.vision/sapi/
+```
+
+### Binance US
+
+```
+BINANCE_API_URL=https://api.binance.us/api/
+BINANCE_SAPI_URL=https://api.binance.us/sapi/
+```
 
 ## Error handling
 
